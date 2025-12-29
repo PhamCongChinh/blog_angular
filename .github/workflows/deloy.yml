@@ -28,7 +28,7 @@ jobs:
       # 4️⃣ Build Angular (production)
       - name: 🛠️ Build Angular app
         run: |
-          npm run build -- --configuration production
+          npm run build
           echo "Build output:"
           ls -la dist
 
@@ -43,7 +43,6 @@ jobs:
           script: |
             sudo rm -rf /usr/share/nginx/angular-app
             sudo mkdir -p /usr/share/nginx/angular-app
-            sudo chown -R $USER:$USER /usr/share/nginx/angular-app
 
       # 6️⃣ Upload build files
       - name: 🚀 Upload dist to server
