@@ -1,0 +1,74 @@
+name: Deploy Angular App to Nginx
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      # 1️⃣ Checkout code
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup Node.js
+      - name: ⚙️ Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 3️⃣ Install dependencies
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      # 4️⃣ Build Angular (production)
+      - name: 🛠️ Build Angular app
+        run: |
+          npm run build -- --configuration production
+          echo "Build output:"
+          ls -la dist
+
+      # 5️⃣ Chuẩn bị thư mục trên server
+      - name: 🧹 Prepare nginx folder
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          port: ${{ secrets.SERVER_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo rm -rf /usr/share/nginx/angular-app
+            sudo mkdir -p /usr/share/nginx/angular-app
+            sudo chown -R $USER:$USER /usr/share/nginx/angular-app
+
+      # 6️⃣ Upload build files
+      - name: 🚀 Upload dist to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          port: ${{ secrets.SERVER_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist/**"
+          target: "/usr/share/nginx/angular-app"
+          strip_components: 1
+          timeout: 180s
+
+      # 7️⃣ Reload nginx
+      - name: 🔄 Reload nginx
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          port: ${{ secrets.SERVER_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl reload nginx
+
+      # 8️⃣ Done
+      - name: ✅ Deployment finished
+        run: echo "🎉 Angular deployed to /usr/share/nginx/angular-app"
