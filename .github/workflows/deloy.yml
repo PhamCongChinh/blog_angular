@@ -18,7 +18,7 @@ jobs:
       - name: Build Angular
         run: |
           npm install
-          npm run build -- --configuration production
+          npm run build
 
       - name: Copy Angular to WSL
         uses: appleboy/scp-action@v0.1.7
