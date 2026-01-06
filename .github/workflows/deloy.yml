@@ -23,12 +23,22 @@ jobs:
         run: |
           npm run build
 
-      - name: Copy Angular to WSL
+      - name: Clean old Angular files
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            mkdir -p /usr/share/nginx/blog_angular
+            rm -rf /usr/share/nginx/blog_angular/*
+
+      - name: Copy Angular to Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "dist/blog_angular"
+          source: "dist/blog_angular/browser/*"
           target: "/usr/share/nginx/blog_angular"
           strip_components: 1
