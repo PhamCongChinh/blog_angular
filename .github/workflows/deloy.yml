@@ -29,6 +29,6 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "dist/**"
-          target: "/usr/share/nginx"
+          source: "dist/blog_angular"
+          target: "/usr/share/nginx/blog_angular"
           strip_components: 1
