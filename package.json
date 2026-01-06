@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "start:ci": "ng serve --host 0.0.0.0 --port 4300",
+    "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:blog_angular": "node dist/blog_angular/server/server.mjs"
